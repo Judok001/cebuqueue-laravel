@@ -1,58 +1,106 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# CebuQueue
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+CebuQueue is a web-based queue management system concept for barangay health centers and clinics in Cebu. The current project provides a foundation for user registration, login, dashboard access, and profile management using Laravel.
 
-## About Laravel
+**Tech Stack:** PHP 8.3+ + Laravel 13 + Blade Templates + Vite + Tailwind CSS + SQLite (default database configuration).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Setup (3 steps)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Requirements:** PHP 8.3 or newer, Composer, Node.js, and npm.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**1. Database**
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+The project is configured to use SQLite by default.
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+copy .env.example .env
+php artisan key:generate
+php artisan migrate
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+If the SQLite database file does not exist, create an empty file at `database/database.sqlite` before running the migrations.
 
-## Contributing
+**2. Backend** (runs at http://127.0.0.1:8000)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Open a terminal in the project folder:
 
-## Code of Conduct
+```bash
+composer install
+php artisan serve
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+If you have not configured the project yet, complete the database setup first.
 
-## Security Vulnerabilities
+**3. Frontend** (Vite development server)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Open a second terminal in the same project folder:
 
-## License
+```bash
+npm install
+npm run dev
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Open **http://127.0.0.1:8000** in your browser to access the Laravel application. Keep both terminal processes running while developing.
+
+## Current Features
+
+- **User Registration:** Allows new users to create an account.
+- **User Login:** Authenticates users using their registered credentials.
+- **Dashboard:** Provides a protected dashboard after login.
+- **Profile Management:** Supports updating profile information and changing passwords.
+- **Account Security:** Includes logout, password confirmation, email verification routes, and password reset functionality.
+- **Database Migrations:** Uses Laravel migrations to create and manage database tables.
+
+## Current Database
+
+The included migrations create the following core tables:
+
+- `users` — stores user account information.
+- `cache` — supports database-backed caching.
+- `jobs` — supports queued background jobs.
+
+The default database connection is SQLite. MySQL can be configured separately through the `.env` file if required.
+
+## Application Routes
+
+- `/` — welcome page.
+- `/register` — user registration.
+- `/login` — user login.
+- `/dashboard` — protected dashboard.
+- `/profile` — profile management.
+- `/forgot-password` — password reset request.
+- `/verify-email` — email verification prompt.
+
+## Not Built Yet
+
+The uploaded project is currently a Laravel starter application with authentication and profile-management functionality. The following CebuQueue-specific features are not implemented in the supplied code:
+
+- Patient queue reservation and ticket generation.
+- Queue position and estimated waiting time.
+- Staff accounts and staff management.
+- Calling the next patient and marking patients as served or absent.
+- Patient registration and walk-in management.
+- Admin reports and service management.
+- Public Now Serving Board.
+- SMS notifications and integration with an SMS gateway.
+- Queue prioritization for urgent cases, senior citizens, persons with disabilities, and pregnant patients.
+
+## Current Milestone: User Registration and Login
+
+The current release provides the foundation for account registration and login using Laravel's built-in authentication structure.
+
+**User Registration**
+- Route: `POST /register`
+- Controller: `app/Http/Controllers/Auth/RegisteredUserController.php`
+- View: `resources/views/auth/register.blade.php`
+- Creates user accounts through Laravel's authentication system.
+
+**User Login**
+- Route: `POST /login`
+- Controller: `app/Http/Controllers/Auth/AuthenticatedSessionController.php`
+- View: `resources/views/auth/login.blade.php`
+- Authenticates registered users using Laravel's session-based authentication.
+
+**How to test:** Register an account, log in with the same credentials, open the dashboard, update your profile, and log out. Try logging in with incorrect credentials to check that authentication rejects them.
+
+**Next milestone:** Build the actual queue management modules, including patient queues, staff and admin roles, queue processing, reports, and the Now Serving Board.

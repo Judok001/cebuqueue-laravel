@@ -1,17 +1,31 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
+@extends('layouts.cebu-app')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    {{ __("You're logged in!") }}
-                </div>
-            </div>
-        </div>
+@section('content')
+    <div class="top">
+        <h2>Welcome, {{ auth()->user()->name }}</h2>
+        <p>
+            @if (auth()->user()->isAdmin())
+                Admin dashboard — manage queue operations and staff access.
+            @else
+                Staff dashboard — manage the queue and patient records.
+            @endif
+        </p>
     </div>
-</x-app-layout>
+
+    <div class="stats">
+        <div class="stat"><div class="num">0</div><div class="lbl">Today's queue count</div></div>
+        <div class="stat"><div class="num">0</div><div class="lbl">Patients served</div></div>
+        <div class="stat"><div class="num">0 min</div><div class="lbl">Average wait time</div></div>
+    </div>
+
+    <h3>Quick actions</h3>
+    <div class="actions">
+        <a href="{{ route('queue') }}">Open queue</a>
+        <a href="{{ route('patients') }}" class="alt">View patient records</a>
+        <a href="{{ route('now-serving') }}" class="alt">Now serving board</a>
+        @if (auth()->user()->isAdmin())
+            <a href="{{ route('reports') }}" class="alt">View reports</a>
+            <a href="{{ route('services-staff') }}" class="alt">Manage staff</a>
+        @endif
+    </div>
+@endsection

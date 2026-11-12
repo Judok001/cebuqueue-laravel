@@ -8,15 +8,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
-use Illuminate\View\View;
 
 class StaffController extends Controller
 {
-    public function index(): View
-    {
-        return view('admin.services-staff');
-    }
-
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -36,5 +30,16 @@ class StaffController extends Controller
         return redirect()
             ->route('services-staff')
             ->with('status', 'Staff account created.');
+    }
+
+    public function destroy(User $staff): RedirectResponse
+    {
+        abort_unless($staff->role === User::ROLE_STAFF, 404);
+
+        $staff->delete();
+
+        return redirect()
+            ->route('services-staff')
+            ->with('status', 'Staff account removed.');
     }
 }

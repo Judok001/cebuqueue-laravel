@@ -18,7 +18,15 @@ class ProfileTest extends TestCase
             ->actingAs($user)
             ->get('/profile');
 
-        $response->assertOk();
+        $response
+            ->assertOk()
+            ->assertSeeText('Profile information')
+            ->assertSeeText('Change password')
+            ->assertSeeText('Delete account')
+            ->assertSee('action="'.route('profile.update').'"', false)
+            ->assertSee('action="'.route('password.update').'"', false)
+            ->assertSee('action="'.route('profile.destroy').'"', false)
+            ->assertSee('css/cebuqueue-ui.css', false);
     }
 
     public function test_profile_information_can_be_updated(): void

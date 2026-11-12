@@ -4,7 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>CebuQueue</title>
+    <title>@yield('title', 'CebuQueue')</title>
+    @yield('head')
     <style>
         * { box-sizing: border-box; }
         body { margin: 0; font-family: Arial, sans-serif; background: #f3f6f5; color: #1f2937; display: flex; min-height: 100vh; }
@@ -36,6 +37,39 @@
         .actions a { background: #0f766e; color: #fff; text-decoration: none; padding: 12px 18px; border-radius: 8px; font-weight: bold; font-size: 15px; }
         .actions a:hover { background: #0d5f58; }
         .actions a.alt { background: #fff; color: #0f5c4d; border: 1px solid #0f766e; }
+        .stat input, .stat select { width: 100%; padding: 11px; border: 1px solid #cbd5d1; border-radius: 8px; font: inherit; }
+        .stat button { padding: 11px 16px; border: 0; border-radius: 8px; background: #0f766e; color: #fff; cursor: pointer; font: inherit; font-weight: 700; }
+        .stat button:hover { background: #0d5f58; }
+        .stat button.button-danger { background: #b91c1c; }
+        .stat button.button-danger:hover { background: #991b1b; }
+        .section-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 16px; }
+        .section-heading h3 { margin: 0; }
+        .table-wrap { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 12px 10px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+        th { color: #4b5563; font-size: 13px; }
+        .search-form, .report-filter { display: flex; align-items: end; flex-wrap: wrap; gap: 10px; }
+        .search-form input { min-width: 220px; }
+        .patient-queue-form { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; min-width: 260px; }
+        .patient-queue-form select { flex: 1 1 140px; min-width: 140px; }
+        .patient-queue-form button { white-space: nowrap; }
+        .report-filter label { margin: 0; }
+        .search-form button, .report-filter button { white-space: nowrap; }
+        .queue-services, .service-list { display: grid; gap: 16px; }
+        .dashboard-queue-heading { margin-top: 28px; }
+        .dashboard-queue-heading p { margin: 4px 0 0; }
+        .serving-card { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; padding: 16px; margin-bottom: 16px; border-radius: 10px; background: #ecfdf5; }
+        .serving-card strong, .serving-card .lbl { display: block; }
+        .serving-card .actions { gap: 8px; }
+        .serving-card form { margin: 0; }
+        .button-secondary { background: #6b7280 !important; }
+        .service-row { display: grid; gap: 14px; padding: 16px 0; border-top: 1px solid #e5e7eb; }
+        .service-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); align-items: end; gap: 12px; }
+        .service-fields label { display: block; margin: 0 0 6px; }
+        .service-fields .checkbox-label { display: flex; align-items: center; gap: 8px; }
+        .service-fields .checkbox-label input { width: auto; }
+        .service-actions { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
         @media (max-width: 700px) {
             body { flex-direction: column; }
             .side { flex: 0 0 auto; width: 100%; padding: 16px; }
@@ -48,10 +82,11 @@
         }
         @media (max-width: 420px) { .stats { grid-template-columns: 1fr; } }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/cebuqueue-ui.css') }}">
 </head>
 <body>
     <div class="side">
-        <h1>CebuQueue</h1>
+        <h1 class="brand-mark">Cebu<span>Queue</span></h1>
         <nav class="nav-links" aria-label="Main navigation">
             <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
             <a href="{{ route('queue') }}" class="{{ request()->routeIs('queue') ? 'active' : '' }}">Queue</a>
@@ -64,7 +99,13 @@
             @endif
             <a href="{{ route('profile.edit') }}" class="{{ request()->routeIs('profile.*') ? 'active' : '' }}">Profile</a>
         </nav>
-        <p class="role-label">{{ auth()->user()->isAdmin() ? 'Health Center Admin' : 'Staff' }}</p>
+        <div class="sidebar-account">
+            <span class="account-indicator"></span>
+            <div>
+                <strong>{{ auth()->user()->name }}</strong>
+                <p class="role-label">{{ auth()->user()->isAdmin() ? 'Health Center Admin' : 'Clinic Staff' }}</p>
+            </div>
+        </div>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit">Log out</button>

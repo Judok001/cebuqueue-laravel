@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ config('app.name', 'CebuQueue') }}</title>
+    <link rel="stylesheet" href="{{ asset('css/health-center-background.css') }}">
     <style>
         * { box-sizing: border-box; }
         body { margin: 0; min-height: 100vh; background: #f3f6f5; color: #1f2937; font-family: Arial, sans-serif; }

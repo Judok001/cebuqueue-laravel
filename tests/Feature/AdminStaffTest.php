@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\QueueTicket;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -31,9 +32,40 @@ class AdminStaffTest extends TestCase
         $this->assertTrue(Hash::check('password123', User::where('email', 'clinic.staff@example.com')->firstOrFail()->password));
     }
 
+    public function test_admin_can_delete_a_staff_account_without_deleting_queue_history(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $staff = User::factory()->create(['role' => User::ROLE_STAFF]);
+        $ticket = QueueTicket::factory()->create(['handled_by' => $staff->id]);
+
+        $response = $this->actingAs($admin)->delete(route('staff.destroy', $staff));
+
+        $response->assertRedirect(route('services-staff'));
+        $response->assertSessionHas('status', 'Staff account removed.');
+        $this->assertDatabaseMissing('users', ['id' => $staff->id]);
+        $this->assertDatabaseHas('queue_tickets', [
+            'id' => $ticket->id,
+            'handled_by' => null,
+        ]);
+    }
+
+    public function test_admin_cannot_delete_another_admin_account(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $otherAdmin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+
+        $this->actingAs($admin)
+            ->delete(route('staff.destroy', $otherAdmin))
+            ->assertNotFound();
+
+        $this->assertModelExists($otherAdmin);
+    }
+
     public function test_staff_cannot_access_admin_only_pages_or_create_staff(): void
     {
         $staff = User::factory()->create(['role' => User::ROLE_STAFF]);
+
+        $this->delete(route('staff.destroy', $staff))->assertRedirect(route('login'));
 
         $this->actingAs($staff)
             ->get(route('services-staff'))
@@ -46,7 +78,10 @@ class AdminStaffTest extends TestCase
             'password_confirmation' => 'password123',
         ])->assertForbidden();
 
+        $this->delete(route('staff.destroy', $staff))->assertForbidden();
+
         $this->assertDatabaseMissing('users', ['email' => 'unauthorized@example.com']);
+        $this->assertModelExists($staff);
     }
 
     public function test_staff_dashboard_hides_admin_navigation(): void
